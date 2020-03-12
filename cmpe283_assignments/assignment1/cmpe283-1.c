@@ -16,7 +16,6 @@
 #define IA32_VMX_PROCBASED_CTLS2 0x48B
 #define IA32_VMX_EXIT_CTLS 0x483
 #define IA32_VMX_ENTRY_CTLS 0x484
-
 /*
  * struct caapability_info
  *
@@ -42,6 +41,16 @@ struct capability_info pinbased[5] =
 	{ 7, "Process Posted Interrupts" }
 };
 
+struct capability_info proc[7] =
+{
+	{ 2, "Interrupt-Window Exiting" },
+	{ 3, "Use TSC Offsetting" },
+	{ 7, "HLT Exiting" },
+	{ 9, "INVLPG Exiting" },
+	{ 10, "MWAIT Exiting" }
+	{ 11, "RDPMC Exiting" }
+	{ 12, "RDTSC Exiting" }
+};
 /*
  * report_capability
  *
