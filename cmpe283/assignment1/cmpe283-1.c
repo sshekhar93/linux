@@ -11,11 +11,18 @@
  * Model specific registers (MSRs) by the module.
  * See SDM volume 4, section 2.1
  */
-#define IA32_VMX_PINBASED_CTLS	0x481
-#define IA32_VMX_PROCBASED_CTLS 0x482
-#define IA32_VMX_PROCBASED_CTLS2 0x48B
-#define IA32_VMX_EXIT_CTLS 0x483
-#define IA32_VMX_ENTRY_CTLS 0x484
+#define IA32_VMX_BASIC			0x480
+#define IA32_VMX_PINBASED_CTLS		0x481
+#define IA32_VMX_PROCBASED_CTLS		0x482
+#define IA32_VMX_PROCBASED_CTLS2	0x48B
+#define IA32_VMX_EXIT_CTLS		0x483
+#define IA32_VMX_ENTRY_CTLS		0x484
+#define IA32_VMX_TRUE_PINBASED_CTLS	0x48D
+#define IA32_VMX_TRUE_PROCBASED_CTLS	0x48E 
+#define IA32_VMX_TRUE_EXIT_CTLS		0x48F
+#define IA32_VMX_TRUE_ENTRY_CTLS	0x490
+#define VMX_TRUE_CONTROLS		0x800000
+#define VMX_SECONDARY_PRCBASED_CONTROL	0x80000000
 /*
  * struct caapability_info
  *
@@ -41,16 +48,94 @@ struct capability_info pinbased[5] =
 	{ 7, "Process Posted Interrupts" }
 };
 
-struct capability_info proc[7] =
+struct capability_info procbased[21] =
 {
 	{ 2, "Interrupt-Window Exiting" },
 	{ 3, "Use TSC Offsetting" },
 	{ 7, "HLT Exiting" },
 	{ 9, "INVLPG Exiting" },
-	{ 10, "MWAIT Exiting" }
-	{ 11, "RDPMC Exiting" }
-	{ 12, "RDTSC Exiting" }
+	{ 10, "MWAIT Exiting" },
+	{ 11, "RDPMC Exiting" },
+	{ 12, "RDTSC Exiting" },
+	{ 15, "CR3-Load Exiting" },
+	{ 16, "CR3-Store Exiting" },
+	{ 19, "CR8-Load Exiting" },
+	{ 20, "CR8-Store Exiting" },
+	{ 21, "Use TPR Shadow" },
+	{ 22, "NMI-Window Exiting" },
+	{ 23, "MOV-DR Exiting" },
+	{ 24, "Unconditional I/O Exiting" },
+	{ 25, "Use I/O Bitmaps" },
+	{ 27, "Monitor Trap Flag" },
+	{ 28, "Use MSR Bitmaps" },
+	{ 29, "MONITOR Exiting" },
+	{ 30, "PAUSE Exiting" },
+	{ 31, "Activate Secondary Controls" }
 };
+
+struct capability_info procbased2[27] =
+{
+	{ 0, "Virtualize APIC Accesses" },
+	{ 1, "Enable EPT" },
+	{ 2, "Descriptor-table Exiting" },
+	{ 3, "Enable RDTSCP" },
+	{ 4, "Virtualize x2APIC Mode" },
+	{ 5, "Enable VPID" },
+	{ 6, "WBINVD Exiting" },
+	{ 7, "Unrestricted Guest" },
+	{ 8, "APIC-register Virtualization" },
+	{ 9, "Virtual-interrupt Delivery" },
+	{ 10, "PAUSE-loop Exiting" },
+	{ 11, "RDRAND Exiting" },
+	{ 12, "Enable INVPCID" },
+	{ 13, "Enable VM Functions" },
+	{ 14, "VMCS Shadowing" },
+	{ 15, "Enable ENCLS Exiting" },
+	{ 16, "RDSEED Exiting" },
+	{ 17, "Enable PML" },
+	{ 18, "EPT-violation #VE" },
+	{ 19, "Conceal VMX From PT" },
+	{ 20, "Enable XSAVES/XRSTORS" },
+	{ 22, "Mode-based Execution Control for EPT" },
+	{ 23, "Sub-page write permissions for EPT"},
+	{ 24, "Intel PT uses guest physical addresses"},
+	{ 25, "Use TSC Scaling" },
+	{ 26, "Enable user wait and pause"},
+	{ 28, "Enable ENCLV exiting"}
+};
+
+struct capability_info vm_entry[11] =
+{
+	{ 2, "Load Debug Controls" },
+	{ 9, "IA-32e mode guest" },
+	{ 10, "Entry to SMM" },
+	{ 11, "Deactivate dual-monitor treatment" },
+	{ 13, "Load IA32_PERF_GLOBAL_CTRL" },
+	{ 14, "Load IA32_PAT" },
+	{ 15, "Load IA32_EFER" },
+	{ 16, "Clear IA32_BNDCFGS" },
+	{ 17, "Conceal VMX from PT" },
+	{ 18, "Load IA32_RTIT_CTL"},
+	{ 20, "Load CET state"}
+};
+
+struct capability_info vm_exit[11] =
+{
+	{ 2, "Save Debug Controls" },
+	{ 9, "Host address-space size" },
+	{ 12, "Load IA32_PERF_GLOBAL_CTRL" },
+	{ 15, "Acknowledge interrupt on exit" },
+	{ 18, "Save IA32_PAT" },
+	{ 19, "Load IA32_PAT" },
+	{ 20, "Save IA32_EFER" },
+	{ 21, "Load IA32_EFER" },
+	{ 22, "Save VMX Preemption Timer Value" },
+	{ 23, "Clear IA32_BNDCFGS" },
+	{ 24, "Conceal VMX from PT" },
+	{ 25, "Clear IA32_RTIT_CTL"},
+	{ 28, "Load CET state"}
+};
+
 /*
  * report_capability
  *
