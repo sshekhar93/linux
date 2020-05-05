@@ -25,64 +25,16 @@
 #include "pmu.h"
 
 atomic_t total_exit_count;
-atomic_t individual_exit_count[2][69] = {{0,0,0,2,2,2,2,0,0,0,0,2,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,2,0,1,2,2,2},{0}};
+atomic_t individual_exit_count[2][69] = {{0,0,0,2,2,2,2,0,0,0,0,2,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,2,0,1,2,2,2},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
 
 EXPORT_SYMBOL(total_exit_count);
 EXPORT_SYMBOL(individual_exit_count);
 
-//setting value of undefiend exit numbers to 1
-/*atomic_add(1,&individual_exit_count[0][35]);
-atomic_add(1,&individual_exit_count[0][38]);
-atomic_add(1,&individual_exit_count[0][42]);
-atomic_add(1,&individual_exit_count[0][65]);
-
-//setting value of unhandled exit numbers to 2
-atomic_add(2,&individual_exit_count[0][3]);
-atomic_add(2,&individual_exit_count[0][4]);
-atomic_add(2,&individual_exit_count[0][5]);
-atomic_add(2,&individual_exit_count[0][6]);
-atomic_add(2,&individual_exit_count[0][11]);
-atomic_add(2,&individual_exit_count[0][16]);
-atomic_add(2,&individual_exit_count[0][17]);
-atomic_add(2,&individual_exit_count[0][33]);
-atomic_add(2,&individual_exit_count[0][34]);
-atomic_add(2,&individual_exit_count[0][51]);
-atomic_add(2,&individual_exit_count[0][63]);
-atomic_add(2,&individual_exit_count[0][64]);
-atomic_add(2,&individual_exit_count[0][66]);
-atomic_add(2,&individual_exit_count[0][67]);
-atomic_add(2,&individual_exit_count[0][68]);*/
-
 atomic64_t total_timer_count;
-atomic64_t individual_timer_count[2][69] = {{0,0,0,2,2,2,2,0,0,0,0,2,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,2,0,1,2,2,2},{0}};
+atomic64_t individual_timer_count[2][69] = {{0,0,0,2,2,2,2,0,0,0,0,2,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,2,0,1,2,2,2},{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
 
 EXPORT_SYMBOL(total_timer_count);
 EXPORT_SYMBOL(individual_timer_count);
-
-
-//setting value of undefiend exit numbers to 1
-/*atomic_add(1,&individual_exit_count[0][35]);
-atomic_add(1,&individual_exit_count[0][38]);
-atomic_add(1,&individual_exit_count[0][42]);
-atomic_add(1,&individual_exit_count[0][65]);
-
-//setting value of unhandled exit numbers to 2
-atomic_add(2,&individual_exit_count[0][3]);
-atomic_add(2,&individual_exit_count[0][4]);
-atomic_add(2,&individual_exit_count[0][5]);
-atomic_add(2,&individual_exit_count[0][6]);
-atomic_add(2,&individual_exit_count[0][11]);
-atomic_add(2,&individual_exit_count[0][16]);
-atomic_add(2,&individual_exit_count[0][17]);
-atomic_add(2,&individual_exit_count[0][33]);
-atomic_add(2,&individual_exit_count[0][34]);
-atomic_add(2,&individual_exit_count[0][51]);
-atomic_add(2,&individual_exit_count[0][63]);
-atomic_add(2,&individual_exit_count[0][64]);
-atomic_add(2,&individual_exit_count[0][66]);
-atomic_add(2,&individual_exit_count[0][67]);
-atomic_add(2,&individual_exit_count[0][68]);
-*/
 
 static u32 xstate_required_size(u64 xstate_bv, bool compacted)
 {
@@ -1117,6 +1069,7 @@ EXPORT_SYMBOL_GPL(kvm_cpuid);
 int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 {
 	u32 eax, ebx, ecx, edx;
+	u32 hiVal = 0, lowVal = 0;
 
 	if (cpuid_fault_enabled(vcpu) && !kvm_require_cpl(vcpu, 0))
 		return 1;
@@ -1125,19 +1078,19 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 	ecx = kvm_rcx_read(vcpu);
 	if(eax == 0x4fffffff){
 		eax = atomic_read(&total_exit_count);
+		printk(KERN_INFO "Total VMX exits = %d\n", eax);
 		ebx = 0x00000000;
 		ecx = 0x00000000;
 		edx = 0x00000000;
-		printk(KERN_INFO "Total VMX exits = %d\n", eax);
 	}
 	else if(eax == 0x4ffffffe){
-		u32 hiVal = ((atomic64_read(&total_timer_count)>>32) & 0xffffffff);
+		hiVal = ((atomic64_read(&total_timer_count)>>32) & 0xffffffff);
 		ebx = hiVal;
-		u32 lowVal = (atomic64_read(&total_timer_count) & 0xffffffff);
+		lowVal = (u32)(atomic64_read(&total_timer_count) & 0xffffffff);
 		ecx = lowVal;
+		printk(KERN_INFO "Total cycles for VMX exits = %llu\n", atomic64_read(&total_timer_count));
 		eax = 0x00000000;
 		edx = 0x00000000;
-		printk(KERN_INFO "Total cycles for VMX exits = %llu\n", atomic64_read(&total_timer_count));
 	}
 	else if(eax == 0x4ffffffd){
 		if((ecx <= 68) && (atomic_read(&individual_exit_count[0][ecx]) !=1)){
@@ -1146,14 +1099,15 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 				kvm_rbx_write(vcpu, 0x00000000);
 				kvm_rcx_write(vcpu, 0x00000000);
 				kvm_rdx_write(vcpu, 0x00000000);
+				printk(KERN_INFO "Exit Type %u not handled in KVM\n",ecx);
 				return kvm_skip_emulated_instruction(vcpu);
 			}
 			else{
 				eax = atomic_read(&individual_exit_count[1][ecx]);
+				printk(KERN_INFO "Total exits for %u = %llu\n",ecx, atomic_read(&individual_exit_count[1][ecx]));
 				ebx = 0x00000000;
 				ecx = 0x00000000;
 				edx = 0x00000000;
-				printk(KERN_INFO "Total exits for %u = %llu\n",ecx, atomic_read(&individual_exit_count[1][ecx]));
 			}
 		}
 		else{
@@ -1161,24 +1115,27 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 			kvm_rbx_write(vcpu, 0x00000000);
 			kvm_rcx_write(vcpu, 0x00000000);
 			kvm_rdx_write(vcpu, 0xffffffff);
+			printk(KERN_INFO "Exit Type %u not supported by CPU\n",ecx);
 			return kvm_skip_emulated_instruction(vcpu);
 		}
 	}
 	else if(eax == 0x4ffffffc){
-		if((ecx <= 68) && (atomic_read(&individual_exit_count[0][ecx]) !=1)){
-			if(atomic_read(&individual_exit_count[0][ecx]) == 2){
+		printk(KERN_INFO "Inside 0x4ffffffc leaf");
+		if((ecx <= 68) && (atomic64_read(&individual_timer_count[0][ecx]) !=1)){
+			if(atomic64_read(&individual_timer_count[0][ecx]) == 2){
 				kvm_rax_write(vcpu, 0x00000000);
 				kvm_rbx_write(vcpu, 0x00000000);
 				kvm_rcx_write(vcpu, 0x00000000);
 				kvm_rdx_write(vcpu, 0x00000000);
+				printk(KERN_INFO "Exit Type %u not handled in KVM\n",ecx);
 				return kvm_skip_emulated_instruction(vcpu);
 			}
 			else{
-				u32 hiVal = ((atomic64_read(&individual_timer_count[1][ecx])>>32) & 0xffffffff);
-				ebx = hiVal;
-				u32 lowVal = (atomic64_read(&individual_timer_count[1][ecx]) & 0xffffffff);
-				ecx = lowVal;
 				printk(KERN_INFO "Total cycles for %u = %llu\n",ecx, atomic64_read(&individual_timer_count[1][ecx]));
+				hiVal = (u32)((atomic64_read(&individual_timer_count[1][ecx])>>32) & 0xffffffff);
+				ebx = hiVal;
+				lowVal = (u32)(atomic64_read(&individual_timer_count[1][ecx]) & 0xffffffff);
+				ecx = lowVal;
 				eax = 0x00000000;
 				edx = 0x00000000;
 			}
@@ -1188,6 +1145,7 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 			kvm_rbx_write(vcpu, 0x00000000);
 			kvm_rcx_write(vcpu, 0x00000000);
 			kvm_rdx_write(vcpu, 0xffffffff);
+			printk(KERN_INFO "Exit Type %u not supported by CPU\n",ecx);
 			return kvm_skip_emulated_instruction(vcpu);
 		}
 	}
