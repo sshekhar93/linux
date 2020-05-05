@@ -1120,7 +1120,6 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 		}
 	}
 	else if(eax == 0x4ffffffc){
-		printk(KERN_INFO "Inside 0x4ffffffc leaf");
 		if((ecx <= 68) && (atomic64_read(&individual_timer_count[0][ecx]) !=1)){
 			if(atomic64_read(&individual_timer_count[0][ecx]) == 2){
 				kvm_rax_write(vcpu, 0x00000000);

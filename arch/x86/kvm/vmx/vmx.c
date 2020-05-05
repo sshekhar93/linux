@@ -5881,6 +5881,9 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu,
 			vcpu->run->internal.ndata++;
 			vcpu->run->internal.data[3] =
 				vmcs_read64(GUEST_PHYSICAL_ADDRESS);
+			stop = rdtsc();
+			atomic64_add((stop - begin),&total_timer_count);
+			atomic64_add((stop-begin),&individual_timer_count[1][exit_reason]);
 		}
 		return 0;
 	}
@@ -5912,18 +5915,48 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu,
 	if (exit_reason >= kvm_vmx_max_exit_handlers)
 		goto unexpected_vmexit;
 #ifdef CONFIG_RETPOLINE
-	if (exit_reason == EXIT_REASON_MSR_WRITE)
-		return kvm_emulate_wrmsr(vcpu);
-	else if (exit_reason == EXIT_REASON_PREEMPTION_TIMER)
-		return handle_preemption_timer(vcpu);
-	else if (exit_reason == EXIT_REASON_INTERRUPT_WINDOW)
-		return handle_interrupt_window(vcpu);
-	else if (exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT)
-		return handle_external_interrupt(vcpu);
-	else if (exit_reason == EXIT_REASON_HLT)
-		return kvm_emulate_halt(vcpu);
-	else if (exit_reason == EXIT_REASON_EPT_MISCONFIG)
-		return handle_ept_misconfig(vcpu);
+	if (exit_reason == EXIT_REASON_MSR_WRITE){
+		ret = kvm_emulate_wrmsr(vcpu);
+		stop = rdtsc();
+		atomic64_add((stop - begin),&total_timer_count);
+		atomic64_add((stop-begin),&individual_timer_count[1][exit_reason]);
+		return ret;
+	}
+	else if (exit_reason == EXIT_REASON_PREEMPTION_TIMER){
+		ret = handle_preemption_timer(vcpu);
+		stop = rdtsc();
+		atomic64_add((stop - begin),&total_timer_count);
+		atomic64_add((stop-begin),&individual_timer_count[1][exit_reason]);
+		return ret;
+	}
+	else if (exit_reason == EXIT_REASON_INTERRUPT_WINDOW){
+		ret = handle_interrupt_window(vcpu);
+		stop = rdtsc();
+		atomic64_add((stop - begin),&total_timer_count);
+		atomic64_add((stop-begin),&individual_timer_count[1][exit_reason]);
+		return ret;
+	}
+	else if (exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT){
+		ret = handle_external_interrupt(vcpu);
+		stop = rdtsc();
+		atomic64_add((stop - begin),&total_timer_count);
+		atomic64_add((stop-begin),&individual_timer_count[1][exit_reason]);
+		return ret;
+	}
+	else if (exit_reason == EXIT_REASON_HLT){
+		ret = kvm_emulate_halt(vcpu);
+		stop = rdtsc();
+		atomic64_add((stop - begin),&total_timer_count);
+		atomic64_add((stop-begin),&individual_timer_count[1][exit_reason]);
+		return ret;
+	}
+	else if (exit_reason == EXIT_REASON_EPT_MISCONFIG){
+		ret = handle_ept_misconfig(vcpu);
+		stop = rdtsc();
+		atomic64_add((stop - begin),&total_timer_count);
+		atomic64_add((stop-begin),&individual_timer_count[1][exit_reason]);
+		return ret;
+	}
 #endif
 
 	exit_reason = array_index_nospec(exit_reason,
